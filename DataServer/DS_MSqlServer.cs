@@ -22,17 +22,19 @@ namespace money_transfer_server_side.DataServer
             {
                 return HttpStatusCode.OK;
             }
-            return HttpStatusCode.Unauthorized;
+            return HttpStatusCode.NotFound;
         }
 
         public HttpStatusCode Register(UserDetailsModel userDetails)
         {
-            if(IsRegistrationSuccess(userDetails.user, userDetails.pwd))
+            if(CheckValueExists(userDetails.user, userDetails.pwd))
             {
-                return HttpStatusCode.OK;
+                return HttpStatusCode.Conflict;
             }
 
-            return HttpStatusCode.Conflict;
+            BeginRegistration(userDetails.user, userDetails.pwd);
+
+            return HttpStatusCode.OK;
         }
 
         public HttpStatusCode Unregister(UserDetailsModel userDetails)
@@ -40,7 +42,7 @@ namespace money_transfer_server_side.DataServer
             throw new NotImplementedException();
         }
 
-        private bool IsRegistrationSuccess(
+        private void BeginRegistration(
             string userId,
             string pwd)
         {
@@ -56,9 +58,7 @@ namespace money_transfer_server_side.DataServer
             oAdap.InsertCommand = oCmd;
 
             oCon.Open();
-            int count = Convert.ToInt32(oCmd.ExecuteNonQuery());
-
-            return count > 0;
+            oCmd.ExecuteNonQuery();
         }
         private bool CheckValueExists(
             string userId, 
