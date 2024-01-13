@@ -9,32 +9,31 @@ using static money_transfer_server_side.EnumsFactory.EnumsAtLarge;
 
 namespace money_transfer_server_side.Controllers
 {
-    public class HomeController(
-        IMts_AuthenticationManager authenticationManager) : Controller
+    public class HomeController : Controller
     {
-        private IMts_AuthenticationManager _authenticationManager = authenticationManager;
+        //private IMts_AuthenticationManager _authenticationManager = authenticationManager;
 
-        [HttpPost]
-        [Route("/[controller]/[action]")]
-        public ActionResult Register([FromBody] string registrationDetails) =>
-             ProcessRequest(registrationDetails, TrasactionTypes.Registration);
+        //[HttpPost]
+        //[Route("/[controller]/[action]")]
+        //public ActionResult Register([FromBody] string registrationDetails) =>
+        //     ProcessRequest(registrationDetails, TrasactionTypes.Registration);
 
-        [HttpPost]
-        [Route("/[controller]/[action]")]
-        public ActionResult Authenticate([FromBody] string auth) =>
-             ProcessRequest(auth, TrasactionTypes.Authentication);        
+        //[HttpPost]
+        //[Route("/[controller]/[action]")]
+        //public ActionResult Authenticate([FromBody] string auth) =>
+        //     ProcessRequest(auth, TrasactionTypes.Authentication);        
 
-        private ActionResult ProcessRequest(
-            string jsonString,
-            TrasactionTypes type)
-        {
-            UserDetailsModel detailsModel = JsonSerializer.Deserialize<Models.UserDetailsModel>(jsonString);
+        //private ActionResult ProcessRequest(
+        //    string jsonString,
+        //    TrasactionTypes type)
+        //{
+        //    UserLogin detailsModel = JsonSerializer.Deserialize<UserLogin>(jsonString);
 
-            if (detailsModel == null) return BadRequest();
+        //    if (detailsModel == null) return BadRequest();
 
-            detailsModel.TrasactionType = type;
+        //    detailsModel.TrasactionType = type;
 
-            return StatusCode((int)_authenticationManager.Begin(detailsModel));
-        }
+        //    return StatusCode((int)_authenticationManager.Begin(detailsModel, config, jwtGenerator));
+        //}
     }
 }

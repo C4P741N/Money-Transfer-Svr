@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using money_transfer_server_side.JsonExtractors;
+using money_transfer_server_side.Utils;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +15,23 @@ builder.Services.AddSwaggerGen();
 
 //Dependency Injection
 builder.Services.AddScoped<IMts_AuthenticationManager, Mts_AuthenticationManager>();
+builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 
 //builder.WebHost.UseUrls("http://*:80", "https://*.443");
+
+//JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
 var app = builder.Build();
 

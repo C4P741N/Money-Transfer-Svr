@@ -1,43 +1,40 @@
-﻿using money_transfer_server_side.Models;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using money_transfer_server_side.Models;
+using money_transfer_server_side.Utils;
 using MongoDB.Driver;
 using System.Data.SqlClient;
 using System.Net;
 
 namespace money_transfer_server_side.DataServer
 {
-    public class DS_MSqlServer : IDataServer
+    public class DS_MSqlServer(
+        IConfiguration config) : IDataServer
     {
-        private readonly string _connectionString;
-        public DS_MSqlServer()
-        {
-            _connectionString = WebApplication.CreateBuilder()
-                .Configuration
-                .GetConnectionString("MSSQL") ?? "wrong connection string assignment";
-
-        }
-
-        public HttpStatusCode Authenticate(UserDetailsModel userDetails)
+        private readonly string _connectionString = config["ConnectionStrings:MSSQL"] ?? "wrong connection string assignment";
+        public HttpResponseMessage Authenticate(UserLogin userDetails)
         {
             if (CheckValueExists(userDetails.user, userDetails.pwd))
             {
-                return HttpStatusCode.OK;
+                return new(HttpStatusCode.Found);
             }
-            return HttpStatusCode.NotFound;
+
+            return new(HttpStatusCode.NotFound);
         }
 
-        public HttpStatusCode Register(UserDetailsModel userDetails)
+        public HttpResponseMessage Register(UserLogin userDetails)
         {
             if(CheckValueExists(userDetails.user, userDetails.pwd))
             {
-                return HttpStatusCode.Conflict;
+                return new(HttpStatusCode.Conflict);
             }
 
             BeginRegistration(userDetails.user, userDetails.pwd);
 
-            return HttpStatusCode.OK;
+            return new(HttpStatusCode.Accepted);
         }
 
-        public HttpStatusCode Unregister(UserDetailsModel userDetails)
+        public HttpResponseMessage Unregister(UserLogin userDetails)
         {
             throw new NotImplementedException();
         }

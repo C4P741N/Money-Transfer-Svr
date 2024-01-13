@@ -5,8 +5,8 @@ namespace money_transfer_server_side.DataServer
 {
     public interface IDataServer
     {
-        HttpStatusCode Authenticate(UserDetailsModel userDetails);
-        HttpStatusCode Register(UserDetailsModel userDetails);
-        HttpStatusCode Unregister(UserDetailsModel userDetails);
+        HttpResponseMessage Authenticate(UserLogin userDetails);
+        HttpResponseMessage Register(UserLogin userDetails);
+        HttpResponseMessage Unregister(UserLogin userDetails);
     }
 }

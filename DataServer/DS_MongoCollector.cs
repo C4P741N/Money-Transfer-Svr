@@ -7,7 +7,7 @@ using System.Net;
 
 namespace money_transfer_server_side.DataServer
 {
-    public class DS_MongoCollector : IDataServer
+    public class DS_MongoCollector(IConfiguration config) : IDataServer
     {
         [Obsolete]
         public void CheckConnection()
@@ -276,22 +276,37 @@ namespace money_transfer_server_side.DataServer
             Console.Read();
         }
 
-        public HttpStatusCode RequestHandler(UserDetailsModel user)
+        public HttpStatusCode RequestHandler(UserLogin user)
         {
             throw new NotImplementedException();
         }
 
-        public HttpStatusCode Authenticate(UserDetailsModel userDetails)
+        public HttpStatusCode Authenticate(UserLogin userDetails)
         {
             throw new NotImplementedException();
         }
 
-        public HttpStatusCode Register(UserDetailsModel userDetails)
+        public HttpStatusCode Register(UserLogin userDetails)
         {
             throw new NotImplementedException();
         }
 
-        public HttpStatusCode Unregister(UserDetailsModel userDetails)
+        public HttpStatusCode Unregister(UserLogin userDetails)
+        {
+            throw new NotImplementedException();
+        }
+
+        HttpResponseMessage IDataServer.Authenticate(UserLogin userDetails)
+        {
+            throw new NotImplementedException();
+        }
+
+        HttpResponseMessage IDataServer.Register(UserLogin userDetails)
+        {
+            throw new NotImplementedException();
+        }
+
+        HttpResponseMessage IDataServer.Unregister(UserLogin userDetails)
         {
             throw new NotImplementedException();
         }
