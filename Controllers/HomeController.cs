@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using money_transfer_server_side.DataServer;
+using money_transfer_server_side.JsonExtractors;
+using money_transfer_server_side.Models;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -6,31 +9,32 @@ using static money_transfer_server_side.EnumsFactory.EnumsAtLarge;
 
 namespace money_transfer_server_side.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(
+        IMts_AuthenticationManager authenticationManager) : Controller
     {
+        private IMts_AuthenticationManager _authenticationManager = authenticationManager;
+
         [HttpPost]
         [Route("/[controller]/[action]")]
         public ActionResult Register([FromBody] string registrationDetails) =>
-             ProcessRequest(registrationDetails, Mtss_TrasactionTypes.Registration);
+             ProcessRequest(registrationDetails, TrasactionTypes.Registration);
 
         [HttpPost]
         [Route("/[controller]/[action]")]
         public ActionResult Authenticate([FromBody] string auth) =>
-             ProcessRequest(auth, Mtss_TrasactionTypes.Authentication);        
+             ProcessRequest(auth, TrasactionTypes.Authentication);        
 
         private ActionResult ProcessRequest(
             string jsonString,
-            Mtss_TrasactionTypes type)
+            TrasactionTypes type)
         {
-            var test = JsonSerializer.Deserialize<UserDetails>(jsonString);
+            UserDetailsModel detailsModel = JsonSerializer.Deserialize<Models.UserDetailsModel>(jsonString);
 
-            return StatusCode((int)HttpStatusCode.Accepted);
+            if (detailsModel == null) return BadRequest();
+
+            detailsModel.TrasactionType = type;
+
+            return StatusCode((int)_authenticationManager.Begin(detailsModel));
         }
-    }
-
-    internal class UserDetails
-    {
-        public string user { get; set; }
-        public string pwd { get; set; }
     }
 }

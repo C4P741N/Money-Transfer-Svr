@@ -2,10 +2,16 @@
 {
     public class EnumsAtLarge
     {
-        public enum Mtss_TrasactionTypes
+        public enum TrasactionTypes
         {
             Registration,
-            Authentication
+            Authentication,
+            Unregister
+        }
+        public enum Server
+        {
+            Mssql,
+            Mongo
         }
     }
 }

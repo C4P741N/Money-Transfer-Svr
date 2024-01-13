@@ -1,3 +1,5 @@
+using money_transfer_server_side.JsonExtractors;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,26 +7,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen();
+
+//Dependency Injection
+builder.Services.AddScoped<IMts_AuthenticationManager, Mts_AuthenticationManager>();
 
 //builder.WebHost.UseUrls("http://*:80", "https://*.443");
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.UseCors(webApi =>
 {
-    //webApi.AllowAnyOrigin();
-    //webApi.WithOrigins("http://localhost:3000/");
-    //webApi.AllowAnyHeader();
-    //webApi.AllowAnyMethod();
-    //webApi.AllowCredentials();
-
     webApi      
     .WithOrigins("http://localhost:3000")
     .AllowAnyHeader()
