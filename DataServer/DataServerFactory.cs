@@ -5,7 +5,7 @@ namespace money_transfer_server_side.DataServer
 {
     public class DataServerFactory
     {
-        public IDataServer GetDataServer(
+        public IAuth GetDataServer(
             EnumsAtLarge.Server server,
             IConfiguration config)
         {

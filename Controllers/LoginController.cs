@@ -25,33 +25,33 @@ namespace money_transfer_server_side.Controllers
         [HttpPost]
         [Route("/[controller]/[action]")]
         public ActionResult Register([FromBody] string registrationDetails) =>
-             ProcessRequest(registrationDetails, TrasactionTypes.Registration);
+             ProcessRequest(registrationDetails, AuthTypes.Registration);
 
         [HttpPost]
         [Route("/[controller]/[action]")]
         public ActionResult Authenticate([FromBody] string auth) =>
-             ProcessRequest(auth, TrasactionTypes.Authentication);
+             ProcessRequest(auth, AuthTypes.Authentication);
 
         private ActionResult ProcessRequest(
             string jsonString,
-            TrasactionTypes type)
+            AuthTypes type)
         {
             UserLogin detailsModel = JsonSerializer.Deserialize<UserLogin>(jsonString);
 
             if (detailsModel == null) return BadRequest();
 
-            detailsModel.TrasactionType = type;
+            detailsModel.AuthType = type;
 
-            HttpResponseMessage result = _authenticationManager.Begin(detailsModel, config);
+            HttpStatusCode status = _authenticationManager.Begin(detailsModel, config);
 
-            if (result.StatusCode == HttpStatusCode.Found)
+            if (status == HttpStatusCode.Found)
             {
                 return new OkObjectResult(new { Token = _jwtGenerator.AttachSuccessToken(detailsModel, _config) });
             }
 
-            return new ObjectResult(result)
+            return new ObjectResult(status)
             {
-                StatusCode = (int)result.StatusCode
+                StatusCode = (int)status
             };
         }
     }

@@ -1,79 +1,36 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using money_transfer_server_side.Models;
-using money_transfer_server_side.Utils;
-using MongoDB.Driver;
-using System.Data.SqlClient;
+﻿using money_transfer_server_side.Models;
 using System.Net;
 
 namespace money_transfer_server_side.DataServer
 {
-    public class DS_MSqlServer(
-        IConfiguration config) : IDataServer
+    public class DS_MSqlServer(IConfiguration config) : IAuth
     {
-        private readonly string _connectionString = config["ConnectionStrings:MSSQL"] ?? "wrong connection string assignment";
-        public HttpResponseMessage Authenticate(UserLogin userDetails)
-        {
-            if (CheckValueExists(userDetails.user, userDetails.pwd))
-            {
-                return new(HttpStatusCode.Found);
-            }
+        private readonly MsqlDataAdapter _msqlDataAdapter = new(config);
 
-            return new(HttpStatusCode.NotFound);
+        public HttpStatusCode Withdraw(TransactionsModel transactions)
+        {
+            return _msqlDataAdapter.AddWithdrawTransaction(transactions);
+        }
+        public HttpStatusCode GetBalance(TransactionsModel transactions)
+        {
+            return _msqlDataAdapter.GetSumAmount(transactions);
+        }
+        public HttpStatusCode Deposit(TransactionsModel transactions)
+        {
+            return _msqlDataAdapter.AddDepositTransaction(transactions);
+        }
+        public HttpStatusCode Authenticate(UserLogin userDetails)
+        {
+            return _msqlDataAdapter.CheckValueExists(userDetails.user, userDetails.pwd);
+        }
+        public HttpStatusCode Register(UserLogin userDetails)
+        {
+            return _msqlDataAdapter.AddUser(userDetails.user, userDetails.pwd);
         }
 
-        public HttpResponseMessage Register(UserLogin userDetails)
+        public HttpStatusCode Unregister(UserLogin userDetails)
         {
-            if(CheckValueExists(userDetails.user, userDetails.pwd))
-            {
-                return new(HttpStatusCode.Conflict);
-            }
-
-            BeginRegistration(userDetails.user, userDetails.pwd);
-
-            return new(HttpStatusCode.Accepted);
+            return HttpStatusCode.NotImplemented;
         }
-
-        public HttpResponseMessage Unregister(UserLogin userDetails)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void BeginRegistration(
-            string userId,
-            string pwd)
-        {
-            string query = "INSERT INTO [dbo].[UserCred] ([UserId] ,[UserPwd]) VALUES (@userId ,@pwd)";
-
-
-            using SqlDataAdapter oAdap = new ();
-            using SqlConnection oCon = new(_connectionString);
-            using SqlCommand oCmd = new(query, oCon);
-            oCmd.Parameters.AddWithValue("@userId", userId);
-            oCmd.Parameters.AddWithValue("@pwd", pwd);
-
-            oAdap.InsertCommand = oCmd;
-
-            oCon.Open();
-            oCmd.ExecuteNonQuery();
-        }
-        private bool CheckValueExists(
-            string userId, 
-            string pwd)
-        {
-            string query = "SELECT COUNT(*) FROM [dbo].[UserCred] WHERE [UserId] = @userId AND [UserPwd] = @pwd";
-
-            using SqlConnection oCon = new(_connectionString);
-            using SqlCommand oCmd = new(query, oCon);
-            oCmd.Parameters.AddWithValue("@userId", userId);
-            oCmd.Parameters.AddWithValue("@pwd", pwd);
-
-            oCon.Open();
-
-            int count = Convert.ToInt32(oCmd.ExecuteScalar());
-
-            return count > 0;
-        }
-
     }
 }

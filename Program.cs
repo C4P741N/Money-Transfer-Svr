@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using money_transfer_server_side.JsonExtractors;
+using money_transfer_server_side.Redirectors;
 using money_transfer_server_side.Utils;
 using System.Text;
 
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 //Dependency Injection
 builder.Services.AddScoped<IMts_AuthenticationManager, Mts_AuthenticationManager>();
+builder.Services.AddScoped<IMts_TransactionManager, Mts_TransactionManager>();
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 
 //builder.WebHost.UseUrls("http://*:80", "https://*.443");

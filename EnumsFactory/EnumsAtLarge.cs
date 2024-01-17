@@ -2,7 +2,7 @@
 {
     public class EnumsAtLarge
     {
-        public enum TrasactionTypes
+        public enum AuthTypes
         {
             Registration,
             Authentication,
@@ -12,6 +12,12 @@
         {
             Mssql,
             Mongo
+        }
+        public enum TransactionTypes
+        {
+            Withdraw,
+            Deposit,
+            CheckBalance
         }
     }
 }

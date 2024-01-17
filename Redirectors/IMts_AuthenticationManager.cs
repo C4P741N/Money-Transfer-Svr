@@ -6,6 +6,6 @@ namespace money_transfer_server_side.JsonExtractors
 {
     public interface IMts_AuthenticationManager
     {
-        HttpResponseMessage Begin(UserLogin userDetails, IConfiguration config);
+        HttpStatusCode Begin(UserLogin userDetails, IConfiguration config);
     }
 }

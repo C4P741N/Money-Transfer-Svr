@@ -9,22 +9,22 @@ namespace money_transfer_server_side.JsonExtractors
 {
     public class Mts_AuthenticationManager : IMts_AuthenticationManager
     {
-        public HttpResponseMessage Begin(
+        public HttpStatusCode Begin(
             UserLogin userDetails,
             IConfiguration config)
         {
-            IDataServer _ds = new DataServerFactory().GetDataServer(EnumsAtLarge.Server.Mssql, config);
+            IAuth _ds = new DataServerFactory().GetDataServer(EnumsAtLarge.Server.Mssql, config);
 
-            switch (userDetails.TrasactionType)
+            switch (userDetails.AuthType)
             {
-                case TrasactionTypes.Registration:
+                case AuthTypes.Registration:
                     return _ds.Register(userDetails);
-                case TrasactionTypes.Authentication:
+                case AuthTypes.Authentication:
                     return _ds.Authenticate(userDetails);
-                case TrasactionTypes.Unregister:
+                case AuthTypes.Unregister:
                     return _ds.Unregister(userDetails);
                 default:
-                    throw new NotSupportedException($"Transaction type {userDetails.TrasactionType} is not supported.");
+                    throw new NotSupportedException($"Authentication type {userDetails.AuthType} is not supported.");
             }
         }
     }

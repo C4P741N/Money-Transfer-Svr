@@ -15,6 +15,8 @@ namespace money_transfer_server_side.Utils
             UserLogin userLogin,
             IConfiguration config)
         {
+            //var refreshToken = GenerateRefreshToken();
+
             return Generate(userLogin, config);
 
             //var token = Generate(userLogin, config);
@@ -41,8 +43,16 @@ namespace money_transfer_server_side.Utils
                 expires: DateTime.Now.AddSeconds(30),
                 signingCredentials: credentials);
 
+            //ACCESS_TOKEN_SECRET
+            //REFRESH_TOKEN_SECRET
+
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private string GenerateRefreshToken()
+        {
+            var refreshToken = Guid.NewGuid().ToString();
+            return refreshToken;
         }
     }
 }
