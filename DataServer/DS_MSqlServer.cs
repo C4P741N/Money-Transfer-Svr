@@ -7,30 +7,25 @@ namespace money_transfer_server_side.DataServer
     {
         private readonly MsqlDataAdapter _msqlDataAdapter = new(config);
 
-        public HttpStatusCode Withdraw(TransactionsModel transactions)
-        {
-            return _msqlDataAdapter.AddWithdrawTransaction(transactions);
-        }
-        public HttpStatusCode GetBalance(TransactionsModel transactions)
-        {
-            return _msqlDataAdapter.GetSumAmount(transactions);
-        }
-        public HttpStatusCode Deposit(TransactionsModel transactions)
-        {
-            return _msqlDataAdapter.AddDepositTransaction(transactions);
-        }
-        public HttpStatusCode Authenticate(UserLogin userDetails)
-        {
-            return _msqlDataAdapter.CheckValueExists(userDetails.user, userDetails.pwd);
-        }
-        public HttpStatusCode Register(UserLogin userDetails)
-        {
-            return _msqlDataAdapter.AddUser(userDetails.user, userDetails.pwd);
-        }
-
-        public HttpStatusCode Unregister(UserLogin userDetails)
-        {
-            return HttpStatusCode.NotImplemented;
-        }
+        public HttpStatusCode Withdraw(TransactionsModel transactions) =>
+            _msqlDataAdapter.AddWithdrawTransaction(transactions);
+        
+        public HttpStatusCode GetBalance(TransactionsModel transactions) =>
+            _msqlDataAdapter.GetSumAmount(transactions);
+        
+        public HttpStatusCode Deposit(TransactionsModel transactions) =>
+            _msqlDataAdapter.AddDepositTransaction(transactions);
+        
+        public HttpStatusCode Authenticate(UserLogin userDetails) =>
+            _msqlDataAdapter.CheckValueExists(userDetails.user, userDetails.pwd);
+        
+        public HttpStatusCode Register(UserLogin userDetails) =>
+            _msqlDataAdapter.AddUser(userDetails.user, userDetails.pwd);
+        
+        public HttpStatusCode Unregister(UserLogin userDetails) =>
+            HttpStatusCode.NotImplemented;
+        
+        public HttpStatusCode CreditTransfer(TransactionsModel transactions) =>
+            throw new NotImplementedException();
     }
 }

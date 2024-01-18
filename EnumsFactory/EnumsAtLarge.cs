@@ -17,7 +17,8 @@
         {
             Withdraw,
             Deposit,
-            CheckBalance
+            CheckBalance,
+            CreditTransfer
         }
     }
 }

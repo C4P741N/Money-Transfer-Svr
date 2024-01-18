@@ -22,6 +22,8 @@ namespace money_transfer_server_side.Redirectors
                     return _ts.Deposit(transactions);
                 case EnumsAtLarge.TransactionTypes.CheckBalance:
                     return _ts.GetBalance(transactions);
+                case EnumsAtLarge.TransactionTypes.CreditTransfer:
+                    return _ts.CreditTransfer(transactions);
                 default:
                     throw new NotSupportedException($"Transaction type {transactions.TrasactionType} is not supported.");
             }

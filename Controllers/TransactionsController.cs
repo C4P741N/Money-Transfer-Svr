@@ -22,20 +22,20 @@ namespace money_transfer_server_side.Controllers
         private readonly IMts_TransactionManager _transactionManager = transactionManager;
 
         [HttpPost("deposit")]
-        public IActionResult Deposit([FromBody] string deposit)
-        {
-            return ProcessRequest(deposit, EnumsAtLarge.TransactionTypes.Deposit);
-        }
+        public IActionResult Deposit([FromBody] string deposit) =>
+             ProcessRequest(deposit, EnumsAtLarge.TransactionTypes.Deposit);
+
         [HttpPost("withdraw")]
-        public IActionResult Withdraw([FromBody] string withdraw)
-        {
-            return ProcessRequest(withdraw, EnumsAtLarge.TransactionTypes.Withdraw);
-        }
+        public IActionResult Withdraw([FromBody] string withdraw) =>
+            ProcessRequest(withdraw, EnumsAtLarge.TransactionTypes.Withdraw);
+        
         [HttpPost("get-balance")]
-        public IActionResult GetBalance([FromBody] string getBalance)
-        {
-            return ProcessRequest(getBalance, EnumsAtLarge.TransactionTypes.CheckBalance);
-        }
+        public IActionResult GetBalance([FromBody] string getBalance) =>
+            ProcessRequest(getBalance, EnumsAtLarge.TransactionTypes.CheckBalance);
+
+        [HttpPost("credit-transfer")]
+        public IActionResult CreditTransfer([FromBody] string creditTransfer) =>
+            ProcessRequest(creditTransfer, EnumsAtLarge.TransactionTypes.CheckBalance);
 
         private IActionResult ProcessRequest(
             string request,

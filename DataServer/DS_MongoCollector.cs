@@ -7,8 +7,7 @@ using System.Net;
 
 namespace money_transfer_server_side.DataServer
 {
-    public class DS_MongoCollector(
-        IConfiguration config) : IAuth
+    public class DS_MongoCollector(IConfiguration config) : IAuth
     {
         [Obsolete]
         public void CheckConnection()
@@ -303,6 +302,11 @@ namespace money_transfer_server_side.DataServer
         }
 
         public HttpStatusCode GetBalance(TransactionsModel transactions)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HttpStatusCode CreditTransfer(TransactionsModel transactions)
         {
             throw new NotImplementedException();
         }
