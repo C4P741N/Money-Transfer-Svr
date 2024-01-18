@@ -11,7 +11,7 @@ using System.Net;
 
 namespace money_transfer_server_side.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("auth")]
     [ApiController]
     public class LoginController(
         IConfiguration config,
@@ -22,13 +22,11 @@ namespace money_transfer_server_side.Controllers
         private readonly IJwtGenerator _jwtGenerator = jwtGenerator;
         private IMts_AuthenticationManager _authenticationManager = authenticationManager;
 
-        [HttpPost]
-        [Route("/[controller]/[action]")]
+        [HttpPost("register")]
         public ActionResult Register([FromBody] string registrationDetails) =>
              ProcessRequest(registrationDetails, AuthTypes.Registration);
 
-        [HttpPost]
-        [Route("/[controller]/[action]")]
+        [HttpPost("authenticate")]
         public ActionResult Authenticate([FromBody] string auth) =>
              ProcessRequest(auth, AuthTypes.Authentication);
 
@@ -36,23 +34,30 @@ namespace money_transfer_server_side.Controllers
             string jsonString,
             AuthTypes type)
         {
-            UserLogin detailsModel = JsonSerializer.Deserialize<UserLogin>(jsonString);
-
-            if (detailsModel == null) return BadRequest();
-
-            detailsModel.AuthType = type;
-
-            HttpStatusCode status = _authenticationManager.Begin(detailsModel, config);
-
-            if (status == HttpStatusCode.Found)
+            try
             {
-                return new OkObjectResult(new { Token = _jwtGenerator.AttachSuccessToken(detailsModel, _config) });
+                UserLogin detailsModel = JsonSerializer.Deserialize<UserLogin>(jsonString);
+
+                if (detailsModel is null) return BadRequest();
+
+                detailsModel.AuthType = type;
+
+                HttpStatusCode status = _authenticationManager.Begin(detailsModel, config);
+
+                if (status is HttpStatusCode.Found)
+                {
+                    return new OkObjectResult(new { Token = _jwtGenerator.AttachSuccessToken(detailsModel, _config) });
+                }
+
+                return new ObjectResult(status)
+                {
+                    StatusCode = (int)status
+                };
             }
-
-            return new ObjectResult(status)
+            catch (Exception)
             {
-                StatusCode = (int)status
-            };
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

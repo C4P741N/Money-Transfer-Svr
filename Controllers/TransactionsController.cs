@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.HttpSys;
 using money_transfer_server_side.EnumsFactory;
 using money_transfer_server_side.Models;
@@ -10,6 +11,9 @@ using System.Text.Json;
 
 namespace money_transfer_server_side.Controllers
 {
+    [Authorize]
+    [ApiController]
+    [Route("transactions")]
     public class TransactionsController(
         IMts_TransactionManager transactionManager,
         IConfiguration config) : Controller
@@ -17,23 +21,20 @@ namespace money_transfer_server_side.Controllers
         private readonly IConfiguration _config = config;
         private readonly IMts_TransactionManager _transactionManager = transactionManager;
 
-        [HttpPost]
-        [Route("/[controller]/[action]")]
+        [HttpPost("deposit")]
         public IActionResult Deposit([FromBody] string deposit)
         {
             return ProcessRequest(deposit, EnumsAtLarge.TransactionTypes.Deposit);
         }
-        [HttpPost]
-        [Route("/[controller]/[action]")]
+        [HttpPost("withdraw")]
         public IActionResult Withdraw([FromBody] string withdraw)
         {
             return ProcessRequest(withdraw, EnumsAtLarge.TransactionTypes.Withdraw);
         }
-        [HttpPost]
-        [Route("/[controller]/[action]")]
-        public IActionResult CheckBalance([FromBody] string checkBalance)
+        [HttpPost("get-balance")]
+        public IActionResult GetBalance([FromBody] string getBalance)
         {
-            return ProcessRequest(checkBalance, EnumsAtLarge.TransactionTypes.CheckBalance);
+            return ProcessRequest(getBalance, EnumsAtLarge.TransactionTypes.CheckBalance);
         }
 
         private IActionResult ProcessRequest(
@@ -42,11 +43,11 @@ namespace money_transfer_server_side.Controllers
         {
             try
             {
-                if (request == null) return BadRequest();
+                if (string.IsNullOrEmpty(request)) return BadRequest();
 
                 TransactionsModel transactions = JsonSerializer.Deserialize<TransactionsModel>(request);
 
-                if (transactions == null) return BadRequest();
+                if (transactions is null) return BadRequest();
 
                 transactions.TrasactionType = transactionTypes;
 
