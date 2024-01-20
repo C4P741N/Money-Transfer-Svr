@@ -8,6 +8,7 @@ namespace money_transfer_server_side.Models
         public double amount { get; set; }
 
         [JsonIgnore]
-        public EnumsFactory.EnumsAtLarge.TransactionTypes TrasactionType { get; set; }
+        public EnumsFactory.EnumsAtLarge.TransactionTypes TrasactionType { get; set; } = 
+            EnumsFactory.EnumsAtLarge.TransactionTypes.None;
     }
 }

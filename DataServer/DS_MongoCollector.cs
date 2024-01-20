@@ -12,7 +12,7 @@ namespace money_transfer_server_side.DataServer
         [Obsolete]
         public void CheckConnection()
         {
-            string username = "danconawm";
+            string username = "dancan";
             string password = "password";
             string mongoDbAuthMechanism = "SCRAM-SHA-1";
 

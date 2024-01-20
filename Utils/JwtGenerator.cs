@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using money_transfer_server_side.Models;
@@ -6,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using MongoDB.Driver.Linq;
 
 namespace money_transfer_server_side.Utils
 {
@@ -47,9 +50,7 @@ namespace money_transfer_server_side.Utils
                 IssuerSigningKey = securityKey
             };
         }
-        public string AttachSuccessToken(
-            UserLogin userLogin,
-            IConfiguration config)
+        public string AttachSuccessToken(UserLogin userLogin)
         {
             //var refreshToken = GenerateRefreshToken();
 
@@ -62,25 +63,58 @@ namespace money_transfer_server_side.Utils
 
             //return response;
         }
+        public JwtModel CreateToken(UserLogin user)
+        {
+            _ = int.TryParse(config["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+            SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
+
+            Claim[] authClaims =
+            [
+                new Claim(ClaimTypes.NameIdentifier, user.user),
+                //new Claim(ClaimTypes.Role, "User") //User Roles
+            ];
+
+            JwtSecurityToken token = new(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
+                claims: authClaims,
+                expires: DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),
+                signingCredentials: credentials);
+
+            var exp = token.ValidTo;
+
+            ClaimsIdentity identity = new(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            AuthenticationProperties props = new();
+            props.Parameters.Add("token", token);
+
+            return new JwtModel
+            {
+                authenticationProperties = props,
+                jwtSecurityToken = token,
+                claimsPrincipal = new ClaimsPrincipal(identity),
+                cookieAuth = CookieAuthenticationDefaults.AuthenticationScheme
+            };
+        }
         private string Generate(
             UserLogin user)
         {
-            
+            _ = int.TryParse(config["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
             SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
             Claim[] claims =
             [
                 new Claim(ClaimTypes.NameIdentifier, user.user),
-                new Claim(ClaimTypes.Role, "User") //User Roles
+                //new Claim(ClaimTypes.Role, "User") //User Roles
             ];
-            JwtSecurityToken token = new(config["Jwt:Issuer"],
-                config["Jwt:Audience"],
-                claims,
-                expires: DateTime.Now.AddSeconds(30),
+            JwtSecurityToken token = new(
+                issuer: config["Jwt:Issuer"],
+                audience: config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
                 signingCredentials: credentials);
 
             //ACCESS_TOKEN_SECRET
             //REFRESH_TOKEN_SECRET
-
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

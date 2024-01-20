@@ -1,10 +1,13 @@
-﻿namespace money_transfer_server_side.Models
+﻿using System.Text.Json.Serialization;
+
+namespace money_transfer_server_side.Models
 {
     public class UserLogin
     {
-        public string user { get; set; }
-        public string pwd { get; set; }
-        public EnumsFactory.EnumsAtLarge.AuthTypes AuthType { get; set; }
+        public string user { get; set; } = string.Empty;
+        public string pwd { get; set; } = string.Empty;
+        public EnumsFactory.EnumsAtLarge.AuthTypes authType { get; set; } 
+            = EnumsFactory.EnumsAtLarge.AuthTypes.None;
 
     }
 }

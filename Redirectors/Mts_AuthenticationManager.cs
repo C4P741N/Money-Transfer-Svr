@@ -13,18 +13,18 @@ namespace money_transfer_server_side.JsonExtractors
             UserLogin userDetails,
             IConfiguration config)
         {
-            IAuth _ds = new DataServerFactory().GetDataServer(EnumsAtLarge.Server.Mssql, config);
+            IAuth ds = new DataServerFactory().GetDataServer(EnumsAtLarge.Server.Mssql, config);
 
-            switch (userDetails.AuthType)
+            switch (userDetails.authType)
             {
                 case AuthTypes.Registration:
-                    return _ds.Register(userDetails);
+                    return ds.Register(userDetails);
                 case AuthTypes.Authentication:
-                    return _ds.Authenticate(userDetails);
+                    return ds.Authenticate(userDetails);
                 case AuthTypes.Unregister:
-                    return _ds.Unregister(userDetails);
+                    return ds.Unregister(userDetails);
                 default:
-                    throw new NotSupportedException($"Authentication type {userDetails.AuthType} is not supported.");
+                    throw new NotSupportedException($"Authentication type {userDetails.authType} is not supported.");
             }
         }
     }
