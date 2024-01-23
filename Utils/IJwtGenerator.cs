@@ -9,7 +9,7 @@ namespace money_transfer_server_side.Utils
     public interface IJwtGenerator
     {
         //HttpResponseMessage AttachSuccessToken(UserLogin user, IConfiguration config);
-        JwtModel CreateToken(UserLogin user);
-        string AttachSuccessToken(UserLogin user);
+        JwtModel CreateRefreshToken(UserLogin user);
+        //string AttachSuccessToken(UserLogin user);
     }
 }

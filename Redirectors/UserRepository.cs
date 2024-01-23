@@ -7,7 +7,7 @@ using static money_transfer_server_side.EnumsFactory.EnumsAtLarge;
 
 namespace money_transfer_server_side.JsonExtractors
 {
-    public class Mts_AuthenticationManager : IMts_AuthenticationManager
+    public class UserRepository : IUserRepository
     {
         public HttpStatusCode Begin(
             UserLogin userDetails,

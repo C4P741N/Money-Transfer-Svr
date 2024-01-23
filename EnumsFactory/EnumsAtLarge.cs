@@ -18,10 +18,10 @@
         public enum TransactionTypes
         {
             None = 0,
-            Withdraw,
-            Deposit,
-            CheckBalance,
-            CreditTransfer
+            Withdraw = 1,
+            Deposit= 2,
+            GetBalance = 3,
+            CreditTransfer = 4
         }
     }
 }

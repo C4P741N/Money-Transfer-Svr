@@ -14,18 +14,18 @@ namespace money_transfer_server_side.Redirectors
         {
             ITrans ts = new DataServerFactory().GetDataServer(EnumsAtLarge.Server.Mssql, config);
 
-            switch (transactions.TrasactionType)
+            switch (transactions.trasactionType)
             {
                 case EnumsAtLarge.TransactionTypes.Withdraw:
                     return ts.Withdraw(transactions);
                 case EnumsAtLarge.TransactionTypes.Deposit:
                     return ts.Deposit(transactions);
-                case EnumsAtLarge.TransactionTypes.CheckBalance:
+                case EnumsAtLarge.TransactionTypes.GetBalance:
                     return ts.GetBalance(transactions);
                 case EnumsAtLarge.TransactionTypes.CreditTransfer:
                     return ts.CreditTransfer(transactions);
                 default:
-                    throw new NotSupportedException($"Transaction type {transactions.TrasactionType} is not supported.");
+                    throw new NotSupportedException($"Transaction type {transactions.trasactionType} is not supported.");
             }
         }
     }

@@ -4,7 +4,7 @@ using System.Net;
 
 namespace money_transfer_server_side.JsonExtractors
 {
-    public interface IMts_AuthenticationManager
+    public interface IUserRepository
     {
         HttpStatusCode Begin(UserLogin userDetails, IConfiguration config);
     }

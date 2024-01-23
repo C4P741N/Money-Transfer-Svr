@@ -22,34 +22,22 @@ namespace money_transfer_server_side.Controllers
         private readonly IMts_TransactionManager _transactionManager = transactionManager;
 
         [HttpPost("deposit")]
-        public IActionResult Deposit([FromBody] string deposit) =>
-             ProcessRequest(deposit, EnumsAtLarge.TransactionTypes.Deposit);
+        public IActionResult Deposit([FromBody] TransactionsModel model) => ProcessRequest(model);
 
         [HttpPost("withdraw")]
-        public IActionResult Withdraw([FromBody] string withdraw) =>
-            ProcessRequest(withdraw, EnumsAtLarge.TransactionTypes.Withdraw);
+        public IActionResult Withdraw([FromBody] TransactionsModel model) => ProcessRequest(model);
         
         [HttpPost("get-balance")]
-        public IActionResult GetBalance([FromBody] string getBalance) =>
-            ProcessRequest(getBalance, EnumsAtLarge.TransactionTypes.CheckBalance);
+        public IActionResult GetBalance([FromBody] TransactionsModel model) => ProcessRequest(model);
 
         [HttpPost("credit-transfer")]
-        public IActionResult CreditTransfer([FromBody] string creditTransfer) =>
-            ProcessRequest(creditTransfer, EnumsAtLarge.TransactionTypes.CheckBalance);
+        public IActionResult CreditTransfer([FromBody] TransactionsModel model) => ProcessRequest(model);
 
-        private IActionResult ProcessRequest(
-            string request,
-            EnumsAtLarge.TransactionTypes transactionTypes)
+        private IActionResult ProcessRequest(TransactionsModel transactions)
         {
             try
             {
-                if (string.IsNullOrEmpty(request)) return BadRequest();
-
-                TransactionsModel transactions = JsonSerializer.Deserialize<TransactionsModel>(request);
-
-                if (transactions is null) return BadRequest();
-
-                transactions.TrasactionType = transactionTypes;
+                if (transactions.trasactionType is EnumsAtLarge.TransactionTypes.None) return BadRequest();
 
                 HttpStatusCode status = _transactionManager.Begin(transactions, _config);
 

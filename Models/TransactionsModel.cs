@@ -7,8 +7,8 @@ namespace money_transfer_server_side.Models
         public string userId { get; set; } = string.Empty;
         public double amount { get; set; }
 
-        [JsonIgnore]
-        public EnumsFactory.EnumsAtLarge.TransactionTypes TrasactionType { get; set; } = 
+        //[JsonIgnore]
+        public EnumsFactory.EnumsAtLarge.TransactionTypes trasactionType { get; set; } = 
             EnumsFactory.EnumsAtLarge.TransactionTypes.None;
     }
 }
