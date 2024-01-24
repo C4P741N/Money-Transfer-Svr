@@ -78,10 +78,8 @@ namespace money_transfer_server_side.Utils
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
                 claims: authClaims,
-                expires: DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),//.AddHours(3),
                 signingCredentials: credentials);
-
-            var exp = token.ValidTo;
 
             ClaimsIdentity identity = new(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
 
