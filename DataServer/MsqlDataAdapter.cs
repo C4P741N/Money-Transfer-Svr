@@ -1,9 +1,12 @@
 ﻿using System;
+using Dapper;
 using System.Data;
 using System.Data.SqlClient;
 using System.Net;
+using System.Transactions;
 using Microsoft.Extensions.Configuration;
 using money_transfer_server_side.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace money_transfer_server_side.DataServer
 {
@@ -13,7 +16,7 @@ namespace money_transfer_server_side.DataServer
 
         private SqlConnection CreateConnection() => new(_connectionString);
 
-        private SqlCommand CreateCommand(string query, SqlConnection connection) =>  new(query, connection);
+        private SqlCommand CreateCommand(string query, SqlConnection connection) => new(query, connection);
 
         private int ExecuteNonQuery(SqlCommand command)
         {
@@ -23,7 +26,6 @@ namespace money_transfer_server_side.DataServer
             command.Connection.Close();
             return rowsAffected;
         }
-
         private double ExecuteScalar(SqlCommand command)
         {
             command.CommandType = CommandType.StoredProcedure;
@@ -31,6 +33,18 @@ namespace money_transfer_server_side.DataServer
             double result = Convert.ToDouble(command.ExecuteScalar());
             command.Connection.Close();
             return result;
+        }
+        private string LoadStringData(SqlCommand command)
+        {
+            if (command == null) return null;
+
+            using (command)
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Connection.Open();
+                using var reader = command.ExecuteReader();
+                return reader.Read() ? reader[0].ToString() : null;
+            }
         }
         public HttpStatusCode AddWithdrawTransaction(TransactionsModel transactions)
         {
@@ -70,30 +84,95 @@ namespace money_transfer_server_side.DataServer
             return HttpStatusCode.InternalServerError;
         }
 
-        public HttpStatusCode AddUser(string userId, string pwd)
+        public HttpStatusCode AddUser(UserLogin userDetails)
         {
-            if (CheckValueExists(userId, pwd) == HttpStatusCode.NotFound)
+            if (CheckUserExists(userDetails) == HttpStatusCode.NotFound)
             {
                 using SqlConnection connection = CreateConnection();
                 using SqlCommand command = CreateCommand("AddUser", connection);
 
-                command.Parameters.AddWithValue("@userId", userId);
-                command.Parameters.AddWithValue("@pwd", pwd);
+                command.Parameters.AddWithValue("@userId", userDetails.user);
+                command.Parameters.AddWithValue("@pwd", userDetails.pwd);
+                command.Parameters.AddWithValue("@email", userDetails.email);
 
                 return ExecuteNonQuery(command) > 0 ? HttpStatusCode.Accepted : HttpStatusCode.InternalServerError;
             }
 
             return HttpStatusCode.Conflict;
         }
-        public HttpStatusCode CheckValueExists(string userId, string pwd)
+        public HttpStatusCode CheckUserExists(UserLogin userDetails)
         {
             using SqlConnection connection = CreateConnection();
             using SqlCommand command = CreateCommand("CheckValueExists", connection);
 
-            command.Parameters.AddWithValue("@userId", userId);
-            command.Parameters.AddWithValue("@pwd", pwd);
+            command.Parameters.AddWithValue("@email", userDetails.email);
+            command.Parameters.AddWithValue("@pwd", userDetails.pwd);
 
             return ExecuteScalar(command) > 0 ? HttpStatusCode.Found : HttpStatusCode.NotFound;
+        }
+        public HttpStatusCode ValidateUser(UserLogin userDetails)
+        {
+            if (CheckUserExists(userDetails) == HttpStatusCode.Found)
+            {
+                using SqlConnection connection = CreateConnection();
+                using SqlCommand command = CreateCommand("GetUserName", connection);
+
+                command.Parameters.AddWithValue("@email", userDetails.email);
+
+                string userId = LoadStringData(command);
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    userDetails.user = userId;
+                    return HttpStatusCode.Found;
+                }
+            }
+
+            return HttpStatusCode.NotFound;
+        }
+        public HttpStatusCode GetTransactionStatements(TransactionDetailsModel transactions)
+        {
+            try
+            {
+                using SqlConnection connection = CreateConnection();
+                using SqlCommand command = CreateCommand("GetAccountValues", connection);
+
+                command.Parameters.AddWithValue("@userId", transactions.userId);
+
+                transactions = LoadToTransactionDetailsModel(command);
+
+                string queryString = $"EXEC [dbo].[GetStatements] {transactions.userId}";
+
+                transactions.Statements = LoadBatchData<StatementModel>(queryString);
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception e)
+            {
+                return HttpStatusCode.InternalServerError;
+            }
+        }
+        private TransactionDetailsModel LoadToTransactionDetailsModel(SqlCommand command)
+        {
+            if (command == null) return null;
+
+            using (command)
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Connection.Open();
+                using var reader = command.ExecuteReader();
+                return new TransactionDetailsModel
+                {
+                    Balance = (double)reader["Sum_Balance"],
+                    AmountReceived = (double)reader["Sum_Received"],
+                    AmountSent = (double)reader["Sum_Sent"],
+                };
+            }
+        }
+        public List<T> LoadBatchData<T>(string sql)
+        {
+            using IDbConnection IDbCn = new SqlConnection(_connectionString);
+            return IDbCn.Query<T>(sql).ToList();
         }
     }
 }

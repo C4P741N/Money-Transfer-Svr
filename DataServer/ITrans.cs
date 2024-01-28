@@ -9,5 +9,6 @@ namespace money_transfer_server_side.DataServer
         HttpStatusCode Deposit(TransactionsModel transactions);
         HttpStatusCode GetBalance(TransactionsModel transactions);
         HttpStatusCode CreditTransfer(TransactionsModel transactions);
+        HttpStatusCode GetUserStatements(TransactionDetailsModel transactions);
     }
 }

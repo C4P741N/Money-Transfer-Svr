@@ -6,6 +6,7 @@ namespace money_transfer_server_side.Models
     {
         public string user { get; set; } = string.Empty;
         public string pwd { get; set; } = string.Empty;
+        public string email { get; set; } = string.Empty;
         public EnumsFactory.EnumsAtLarge.AuthTypes authType { get; set; } 
             = EnumsFactory.EnumsAtLarge.AuthTypes.None;
 

@@ -20,8 +20,8 @@ namespace money_transfer_server_side.Redirectors
                     return ts.Withdraw(transactions);
                 case EnumsAtLarge.TransactionTypes.Deposit:
                     return ts.Deposit(transactions);
-                case EnumsAtLarge.TransactionTypes.GetBalance:
-                    return ts.GetBalance(transactions);
+                case EnumsAtLarge.TransactionTypes.GetDashboardValues:
+                    return ts.GetUserStatements(transactions);
                 case EnumsAtLarge.TransactionTypes.CreditTransfer:
                     return ts.CreditTransfer(transactions);
                 default:

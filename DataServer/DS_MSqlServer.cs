@@ -17,15 +17,17 @@ namespace money_transfer_server_side.DataServer
             _msqlDataAdapter.AddDepositTransaction(transactions);
         
         public HttpStatusCode Authenticate(UserLogin userDetails) =>
-            _msqlDataAdapter.CheckValueExists(userDetails.user, userDetails.pwd);
+            _msqlDataAdapter.ValidateUser(userDetails);
         
         public HttpStatusCode Register(UserLogin userDetails) =>
-            _msqlDataAdapter.AddUser(userDetails.user, userDetails.pwd);
+            _msqlDataAdapter.AddUser(userDetails);
         
         public HttpStatusCode Unregister(UserLogin userDetails) =>
             HttpStatusCode.NotImplemented;
         
         public HttpStatusCode CreditTransfer(TransactionsModel transactions) =>
             throw new NotImplementedException();
+        public HttpStatusCode GetUserStatements(TransactionDetailsModel transactions) =>
+            _msqlDataAdapter.GetTransactionStatements(transactions);
     }
 }

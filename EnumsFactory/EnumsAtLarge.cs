@@ -20,7 +20,7 @@
             None = 0,
             Withdraw = 1,
             Deposit= 2,
-            GetBalance = 3,
+            GetDashboardValues = 3,
             CreditTransfer = 4
         }
     }
