@@ -21,7 +21,7 @@ namespace money_transfer_server_side.Redirectors
                 case EnumsAtLarge.TransactionTypes.Deposit:
                     return ts.Deposit(transactions);
                 case EnumsAtLarge.TransactionTypes.GetDashboardValues:
-                    return ts.GetUserStatements(transactions);
+                    return ts.GetUserStatements((TransactionDetailsModel)transactions);
                 case EnumsAtLarge.TransactionTypes.CreditTransfer:
                     return ts.CreditTransfer(transactions);
                 default:
