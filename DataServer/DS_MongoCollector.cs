@@ -310,6 +310,11 @@ namespace money_transfer_server_side.DataServer
         {
             throw new NotImplementedException();
         }
+
+        public HttpStatusCode GetUserStatements(TransactionDetailsModel transactions)
+        {
+            throw new NotImplementedException();
+        }
     }
     public class Weather
     {

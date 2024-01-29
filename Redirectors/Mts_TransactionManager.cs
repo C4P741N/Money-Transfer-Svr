@@ -8,7 +8,7 @@ namespace money_transfer_server_side.Redirectors
 {
     public class Mts_TransactionManager : IMts_TransactionManager
     {
-        public HttpStatusCode Begin(
+        public TransactionsModel Begin(
             TransactionsModel transactions,
             IConfiguration config)
         {
@@ -17,13 +17,24 @@ namespace money_transfer_server_side.Redirectors
             switch (transactions.trasactionType)
             {
                 case EnumsAtLarge.TransactionTypes.Withdraw:
-                    return ts.Withdraw(transactions);
+                    transactions.StatusCode = ts.Withdraw(transactions);
+                    return transactions;
                 case EnumsAtLarge.TransactionTypes.Deposit:
-                    return ts.Deposit(transactions);
+                    transactions.StatusCode = ts.Deposit(transactions);
+                    return transactions;
                 case EnumsAtLarge.TransactionTypes.GetDashboardValues:
-                    return ts.GetUserStatements((TransactionDetailsModel)transactions);
+                    TransactionDetailsModel transactionDetails = new()
+                    {
+                        userId = transactions.userId,
+                        trasactionType = transactions.trasactionType
+                    };
+
+                    transactionDetails.StatusCode = ts.GetUserStatements(transactionDetails);
+
+                    return transactionDetails;
                 case EnumsAtLarge.TransactionTypes.CreditTransfer:
-                    return ts.CreditTransfer(transactions);
+                    transactions.StatusCode = ts.CreditTransfer(transactions);
+                    return transactions;
                 default:
                     throw new NotSupportedException($"Transaction type {transactions.trasactionType} is not supported.");
             }

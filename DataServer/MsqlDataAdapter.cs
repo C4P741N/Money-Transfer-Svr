@@ -63,6 +63,8 @@ namespace money_transfer_server_side.DataServer
 
             command.Parameters.AddWithValue("@userId", transactions.userId);
             command.Parameters.AddWithValue("@amount", transactions.amount);
+            command.Parameters.AddWithValue("@timeStamp", DateTime.Now);
+            command.Parameters.AddWithValue("@type", transactions.trasactionType);
 
             return ExecuteNonQuery(command) > 0 ? GetSumAmount(transactions) : HttpStatusCode.NotModified;
         }
@@ -139,7 +141,7 @@ namespace money_transfer_server_side.DataServer
 
                 command.Parameters.AddWithValue("@userId", transactions.userId);
 
-                transactions = LoadToTransactionDetailsModel(command);
+                transactions = LoadToTransactionDetailsModel(command, transactions);
 
                 string queryString = $"EXEC [dbo].[GetStatements] {transactions.userId}";
 
@@ -152,22 +154,28 @@ namespace money_transfer_server_side.DataServer
                 return HttpStatusCode.InternalServerError;
             }
         }
-        private TransactionDetailsModel LoadToTransactionDetailsModel(SqlCommand command)
+        private TransactionDetailsModel LoadToTransactionDetailsModel(
+            SqlCommand command,
+            TransactionDetailsModel transactions)
         {
-            if (command == null) return null;
-
-            using (command)
+            if (command != null)
             {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Connection.Open();
-                using var reader = command.ExecuteReader();
-                return new TransactionDetailsModel
+
+                using (command)
                 {
-                    Balance = (double)reader["Sum_Balance"],
-                    AmountReceived = (double)reader["Sum_Received"],
-                    AmountSent = (double)reader["Sum_Sent"],
-                };
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Connection.Open();
+                    using var reader = command.ExecuteReader();
+                    if (reader.Read()) // Check if there are rows
+                    {
+                        transactions.Balance = Convert.ToDouble(reader["Sum_Balance"]);
+                        transactions.AmountReceived = Convert.ToDouble(reader["Sum_Received"]);
+                        transactions.AmountSent = Convert.ToDouble(reader["Sum_Sent"]);
+                    }
+                }
             }
+
+            return transactions;
         }
         public List<T> LoadBatchData<T>(string sql)
         {

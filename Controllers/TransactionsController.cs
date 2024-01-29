@@ -27,8 +27,8 @@ namespace money_transfer_server_side.Controllers
         [HttpPost("withdraw")]
         public IActionResult Withdraw([FromBody] TransactionsModel model) => ProcessRequest(model);
         
-        [HttpPost("get-balance")]
-        public IActionResult GetBalance([FromBody] TransactionsModel model) => ProcessRequest(model);
+        [HttpPost("populate-dashboard")]
+        public IActionResult GetDashboardValues([FromBody] TransactionsModel model) => ProcessRequest(model);
 
         [HttpPost("credit-transfer")]
         public IActionResult CreditTransfer([FromBody] TransactionsModel model) => ProcessRequest(model);
@@ -39,12 +39,14 @@ namespace money_transfer_server_side.Controllers
             {
                 if (transactions.trasactionType is EnumsAtLarge.TransactionTypes.None) return BadRequest();
 
-                HttpStatusCode status = _transactionManager.Begin(transactions, _config);
+                var model = _transactionManager.Begin(transactions, _config);
+
+                HttpStatusCode status = model.StatusCode;
 
                 return new ObjectResult(status)
                 {
                     StatusCode = (int)status,
-                    Value = transactions
+                    Value = model
                 };
             }
             catch (Exception)

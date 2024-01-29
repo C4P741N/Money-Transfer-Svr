@@ -5,6 +5,6 @@ namespace money_transfer_server_side.Redirectors
 {
     public interface IMts_TransactionManager
     {
-        HttpStatusCode Begin(TransactionsModel transactions, IConfiguration config);
+        TransactionsModel Begin(TransactionsModel transactions, IConfiguration config);
     }
 }
