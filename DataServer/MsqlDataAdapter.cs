@@ -7,6 +7,7 @@ using System.Transactions;
 using Microsoft.Extensions.Configuration;
 using money_transfer_server_side.Models;
 using Microsoft.AspNetCore.Http;
+using money_transfer_server_side.EnumsFactory;
 
 namespace money_transfer_server_side.DataServer
 {
@@ -15,9 +16,8 @@ namespace money_transfer_server_side.DataServer
         private readonly string _connectionString = config["ConnectionStrings:MSSQL"] ?? throw new ArgumentException("Invalid connection string");
 
         private SqlConnection CreateConnection() => new(_connectionString);
-
         private SqlCommand CreateCommand(string query, SqlConnection connection) => new(query, connection);
-
+        
         private int ExecuteNonQuery(SqlCommand command)
         {
             command.CommandType = CommandType.StoredProcedure;
@@ -46,8 +46,17 @@ namespace money_transfer_server_side.DataServer
                 return reader.Read() ? reader[0].ToString() : null;
             }
         }
+        public HttpStatusCode AddTransferFunds(TransactionsModel transactions)
+        {
+            return AddWithdrawTransaction(transactions);
+        }
         public HttpStatusCode AddWithdrawTransaction(TransactionsModel transactions)
         {
+            if (GetSumAmount(transactions) < transactions.amount)
+            {
+                return HttpStatusCode.BadRequest;
+            }
+
             transactions.amount = -transactions.amount;
             return AddTransaction(transactions);
         }
@@ -55,6 +64,18 @@ namespace money_transfer_server_side.DataServer
         public HttpStatusCode AddDepositTransaction(TransactionsModel transactions)
         {
             return AddTransaction(transactions);
+        }
+        private HttpStatusCode UpdateAcounts(TransactionsModel transactions)
+        {
+            using SqlConnection connection = CreateConnection();
+            using SqlCommand command = CreateCommand("UpdateAccounts", connection);
+
+            command.Parameters.AddWithValue("@userId", transactions.userId);
+            command.Parameters.AddWithValue("@deposit", (int)EnumsAtLarge.TransactionTypes.Deposit);
+            command.Parameters.AddWithValue("@transfer", (int)EnumsAtLarge.TransactionTypes.CreditTransfer);
+            command.Parameters.AddWithValue("@withdraw", (int)EnumsAtLarge.TransactionTypes.Withdraw);
+
+            return ExecuteNonQuery(command) > 0 ? HttpStatusCode.Accepted : HttpStatusCode.NotModified;
         }
         private HttpStatusCode AddTransaction(TransactionsModel transactions)
         {
@@ -65,10 +86,11 @@ namespace money_transfer_server_side.DataServer
             command.Parameters.AddWithValue("@amount", transactions.amount);
             command.Parameters.AddWithValue("@timeStamp", DateTime.Now);
             command.Parameters.AddWithValue("@type", transactions.trasactionType);
+            command.Parameters.AddWithValue("@recepient", transactions.recepient);
 
-            return ExecuteNonQuery(command) > 0 ? GetSumAmount(transactions) : HttpStatusCode.NotModified;
+            return ExecuteNonQuery(command) > 0 ? UpdateAcounts(transactions) : HttpStatusCode.NotModified;
         }
-        public HttpStatusCode GetSumAmount(TransactionsModel transactions)
+        public double GetSumAmount(TransactionsModel transactions)
         {
             using SqlConnection connection = CreateConnection();
             using SqlCommand command = CreateCommand("GetSumAmount", connection);
@@ -77,13 +99,7 @@ namespace money_transfer_server_side.DataServer
 
             double newAmount = ExecuteScalar(command);
 
-            if (newAmount >= 0)
-            {
-                transactions.amount = newAmount;
-                return HttpStatusCode.Accepted;
-            }
-
-            return HttpStatusCode.InternalServerError;
+            return newAmount;
         }
 
         public HttpStatusCode AddUser(UserLogin userDetails)

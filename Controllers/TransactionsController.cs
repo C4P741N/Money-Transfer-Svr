@@ -39,6 +39,8 @@ namespace money_transfer_server_side.Controllers
             {
                 if (transactions.trasactionType is EnumsAtLarge.TransactionTypes.None) return BadRequest();
 
+                if (string.IsNullOrEmpty(transactions.recepient)) transactions.recepient = "self";
+
                 var model = _transactionManager.Begin(transactions, _config);
 
                 HttpStatusCode status = model.StatusCode;

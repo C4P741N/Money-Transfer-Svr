@@ -10,8 +10,8 @@ namespace money_transfer_server_side.DataServer
         public HttpStatusCode Withdraw(TransactionsModel transactions) =>
             _msqlDataAdapter.AddWithdrawTransaction(transactions);
         
-        public HttpStatusCode GetBalance(TransactionsModel transactions) =>
-            _msqlDataAdapter.GetSumAmount(transactions);
+        //public HttpStatusCode GetBalance(TransactionsModel transactions) =>
+        //    _msqlDataAdapter.GetSumAmount(transactions);
         
         public HttpStatusCode Deposit(TransactionsModel transactions) =>
             _msqlDataAdapter.AddDepositTransaction(transactions);
@@ -26,7 +26,7 @@ namespace money_transfer_server_side.DataServer
             HttpStatusCode.NotImplemented;
         
         public HttpStatusCode CreditTransfer(TransactionsModel transactions) =>
-            throw new NotImplementedException();
+            _msqlDataAdapter.AddTransferFunds(transactions);
         public HttpStatusCode GetUserStatements(TransactionDetailsModel transactions) =>
             _msqlDataAdapter.GetTransactionStatements(transactions);
     }
