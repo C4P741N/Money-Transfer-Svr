@@ -21,7 +21,7 @@ namespace money_transfer_server_side.Controllers
 {
     [Route("auth")]
     [ApiController]
-    public class LoginController(
+    public class UserAthentication(
         IConfiguration config,
         IJwtGenerator jwtGenerator,
         IUserRepository authenticationManager) : ControllerBase
