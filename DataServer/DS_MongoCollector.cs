@@ -315,6 +315,41 @@ namespace money_transfer_server_side.DataServer
         {
             throw new NotImplementedException();
         }
+
+        Task<HttpStatusCode> ITrans.Withdraw(TransactionsModel transactions)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<HttpStatusCode> ITrans.Deposit(TransactionsModel transactions)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<HttpStatusCode> ITrans.CreditTransfer(TransactionsModel transactions)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<HttpStatusCode> ITrans.GetUserStatements(TransactionDetailsModel transactions)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<HttpStatusCode> IAuth.Authenticate(UserLogin userDetails)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<HttpStatusCode> IAuth.Register(UserLogin userDetails)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<HttpStatusCode> IAuth.Unregister(UserLogin userDetails)
+        {
+            throw new NotImplementedException();
+        }
     }
     public class Weather
     {

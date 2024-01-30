@@ -5,8 +5,8 @@ namespace money_transfer_server_side.DataServer
 {
     public interface IAuth: ITrans
     {
-        HttpStatusCode Authenticate(UserLogin userDetails);
-        HttpStatusCode Register(UserLogin userDetails);
-        HttpStatusCode Unregister(UserLogin userDetails);
+        Task<HttpStatusCode> Authenticate(UserLogin userDetails);
+        Task<HttpStatusCode> Register(UserLogin userDetails);
+        Task<HttpStatusCode> Unregister(UserLogin userDetails);
     }
 }

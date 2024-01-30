@@ -15,72 +15,102 @@ namespace money_transfer_server_side.DataServer
     {
         private readonly string _connectionString = config["ConnectionStrings:MSSQL"] ?? throw new ArgumentException("Invalid connection string");
 
-        private SqlConnection CreateConnection() => new(_connectionString);
-        private SqlCommand CreateCommand(string query, SqlConnection connection) => new(query, connection);
+        private async Task<SqlConnection> CreateOpenConnectionAsync()
+        {
+            SqlConnection connection = new(_connectionString);
+            await connection.OpenAsync();
+            return connection;
+        }
+        private SqlCommand CreateStoredProcedureCommand(string query, SqlConnection connection)
+        {
+            //new(query, connection);
+
+            return new SqlCommand(query, connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+        }
         
-        private int ExecuteNonQuery(SqlCommand command)
+        private async Task<int> ExecuteNonQueryAsync(SqlCommand command)
         {
-            command.CommandType = CommandType.StoredProcedure;
-            command.Connection.Open();
-            int rowsAffected = command.ExecuteNonQuery();
-            command.Connection.Close();
-            return rowsAffected;
-        }
-        private double ExecuteScalar(SqlCommand command)
-        {
-            command.CommandType = CommandType.StoredProcedure;
-            command.Connection.Open();
-            double result = Convert.ToDouble(command.ExecuteScalar());
-            command.Connection.Close();
-            return result;
-        }
-        private string LoadStringData(SqlCommand command)
-        {
-            if (command == null) return null;
+            //command.CommandType = CommandType.StoredProcedure;
+            //command.Connection.Open();
+            //int rowsAffected = command.ExecuteNonQuery();
+            //command.Connection.Close();
+            //return rowsAffected;
 
             using (command)
             {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Connection.Open();
-                using var reader = command.ExecuteReader();
+                return await command.ExecuteNonQueryAsync();
+            }
+        }
+        private async Task<double> ExecuteScalarAsync(SqlCommand command)
+        {
+            //command.CommandType = CommandType.StoredProcedure;
+            //command.Connection.Open();
+            //double result = Convert.ToDouble(command.ExecuteScalar());
+            //command.Connection.Close();
+            //return result;
+
+            using (command)
+            {
+                object result = await command.ExecuteScalarAsync() ?? 0;
+                return Convert.ToDouble(result);
+            }
+        }
+        private async Task<string> LoadStringDataAsync(SqlCommand command)
+        {
+            //if (command == null) return null;
+
+            //using (command)
+            //{
+            //    command.CommandType = CommandType.StoredProcedure;
+            //    command.Connection.Open();
+            //    using var reader = command.ExecuteReader();
+            //    return reader.Read() ? reader[0].ToString() : null;
+            //}
+
+            using (command)
+            {
+                using var reader = await command.ExecuteReaderAsync();
                 return reader.Read() ? reader[0].ToString() : null;
             }
         }
-        public HttpStatusCode AddTransferFunds(TransactionsModel transactions)
+        public async Task<HttpStatusCode> AddTransferFunds(TransactionsModel transactions)
         {
-            return AddWithdrawTransaction(transactions);
+            return await AddWithdrawTransaction(transactions);
         }
-        public HttpStatusCode AddWithdrawTransaction(TransactionsModel transactions)
+        public async Task<HttpStatusCode> AddWithdrawTransaction(TransactionsModel transactions)
         {
-            if (GetSumAmount(transactions) < transactions.amount)
+            if (await GetSumAmount(transactions) < transactions.amount)
             {
                 return HttpStatusCode.BadRequest;
             }
 
             transactions.amount = -transactions.amount;
-            return AddTransaction(transactions);
+            return await AddTransaction(transactions);
         }
 
-        public HttpStatusCode AddDepositTransaction(TransactionsModel transactions)
+        public async Task<HttpStatusCode> AddDepositTransaction(TransactionsModel transactions)
         {
-            return AddTransaction(transactions);
+            return await AddTransaction(transactions);
         }
-        private HttpStatusCode UpdateAcounts(TransactionsModel transactions)
+        private async Task<HttpStatusCode> UpdateAcounts(TransactionsModel transactions)
         {
-            using SqlConnection connection = CreateConnection();
-            using SqlCommand command = CreateCommand("UpdateAccounts", connection);
+            using SqlConnection connection = await CreateOpenConnectionAsync();
+            using SqlCommand command = CreateStoredProcedureCommand("UpdateAccounts", connection);
 
             command.Parameters.AddWithValue("@userId", transactions.userId);
             command.Parameters.AddWithValue("@deposit", (int)EnumsAtLarge.TransactionTypes.Deposit);
             command.Parameters.AddWithValue("@transfer", (int)EnumsAtLarge.TransactionTypes.CreditTransfer);
             command.Parameters.AddWithValue("@withdraw", (int)EnumsAtLarge.TransactionTypes.Withdraw);
 
-            return ExecuteNonQuery(command) > 0 ? HttpStatusCode.Accepted : HttpStatusCode.NotModified;
+            return await ExecuteNonQueryAsync(command) > 0 ? HttpStatusCode.Accepted : HttpStatusCode.NotModified;
         }
-        private HttpStatusCode AddTransaction(TransactionsModel transactions)
+        private async Task<HttpStatusCode> AddTransaction(TransactionsModel transactions)
         {
-            using SqlConnection connection = CreateConnection();
-            using SqlCommand command = CreateCommand("AddTransaction", connection);
+            using SqlConnection connection = await CreateOpenConnectionAsync();
+            using SqlCommand command = CreateStoredProcedureCommand("AddTransaction", connection);
 
             command.Parameters.AddWithValue("@userId", transactions.userId);
             command.Parameters.AddWithValue("@amount", transactions.amount);
@@ -88,56 +118,54 @@ namespace money_transfer_server_side.DataServer
             command.Parameters.AddWithValue("@type", transactions.trasactionType);
             command.Parameters.AddWithValue("@recepient", transactions.recepient);
 
-            return ExecuteNonQuery(command) > 0 ? UpdateAcounts(transactions) : HttpStatusCode.NotModified;
+            return await ExecuteNonQueryAsync(command) > 0 ? await UpdateAcounts(transactions) : HttpStatusCode.NotModified;
         }
-        public double GetSumAmount(TransactionsModel transactions)
+        public async Task<double> GetSumAmount(TransactionsModel transactions)
         {
-            using SqlConnection connection = CreateConnection();
-            using SqlCommand command = CreateCommand("GetSumAmount", connection);
+            using SqlConnection connection = await CreateOpenConnectionAsync();
+            using SqlCommand command = CreateStoredProcedureCommand("GetSumAmount", connection);
 
             command.Parameters.AddWithValue("@userId", transactions.userId);
 
-            double newAmount = ExecuteScalar(command);
-
-            return newAmount;
+            return await ExecuteScalarAsync(command);
         }
 
-        public HttpStatusCode AddUser(UserLogin userDetails)
+        public async Task<HttpStatusCode> AddUser(UserLogin userDetails)
         {
-            if (CheckUserExists(userDetails) == HttpStatusCode.NotFound)
+            if (await CheckUserExists(userDetails) is HttpStatusCode.NotFound)
             {
-                using SqlConnection connection = CreateConnection();
-                using SqlCommand command = CreateCommand("AddUser", connection);
+                using SqlConnection connection = await CreateOpenConnectionAsync();
+                using SqlCommand command = CreateStoredProcedureCommand("AddUser", connection);
 
                 command.Parameters.AddWithValue("@userId", userDetails.user);
                 command.Parameters.AddWithValue("@pwd", userDetails.pwd);
                 command.Parameters.AddWithValue("@email", userDetails.email);
 
-                return ExecuteNonQuery(command) > 0 ? HttpStatusCode.Accepted : HttpStatusCode.InternalServerError;
+                return await ExecuteNonQueryAsync(command) > 0 ? HttpStatusCode.Accepted : HttpStatusCode.InternalServerError;
             }
 
             return HttpStatusCode.Conflict;
         }
-        public HttpStatusCode CheckUserExists(UserLogin userDetails)
+        public async Task<HttpStatusCode> CheckUserExists(UserLogin userDetails)
         {
-            using SqlConnection connection = CreateConnection();
-            using SqlCommand command = CreateCommand("CheckValueExists", connection);
+            using SqlConnection connection = await CreateOpenConnectionAsync();
+            using SqlCommand command = CreateStoredProcedureCommand("CheckValueExists", connection);
 
             command.Parameters.AddWithValue("@email", userDetails.email);
             command.Parameters.AddWithValue("@pwd", userDetails.pwd);
 
-            return ExecuteScalar(command) > 0 ? HttpStatusCode.Found : HttpStatusCode.NotFound;
+            return await ExecuteScalarAsync(command) > 0 ? HttpStatusCode.Found : HttpStatusCode.NotFound;
         }
-        public HttpStatusCode ValidateUser(UserLogin userDetails)
+        public async Task<HttpStatusCode> ValidateUser(UserLogin userDetails)
         {
-            if (CheckUserExists(userDetails) == HttpStatusCode.Found)
+            if (await CheckUserExists(userDetails) is HttpStatusCode.Found)
             {
-                using SqlConnection connection = CreateConnection();
-                using SqlCommand command = CreateCommand("GetUserName", connection);
+                using SqlConnection connection = await CreateOpenConnectionAsync();
+                using SqlCommand command = CreateStoredProcedureCommand("GetUserName", connection);
 
                 command.Parameters.AddWithValue("@email", userDetails.email);
 
-                string userId = LoadStringData(command);
+                string userId = await LoadStringDataAsync(command);
 
                 if (!string.IsNullOrEmpty(userId))
                 {
@@ -148,16 +176,16 @@ namespace money_transfer_server_side.DataServer
 
             return HttpStatusCode.NotFound;
         }
-        public HttpStatusCode GetTransactionStatements(TransactionDetailsModel transactions)
+        public async Task<HttpStatusCode> GetTransactionStatements(TransactionDetailsModel transactions)
         {
             try
             {
-                using SqlConnection connection = CreateConnection();
-                using SqlCommand command = CreateCommand("GetAccountValues", connection);
+                using SqlConnection connection = await CreateOpenConnectionAsync();
+                using SqlCommand command = CreateStoredProcedureCommand("GetAccountValues", connection);
 
                 command.Parameters.AddWithValue("@userId", transactions.userId);
 
-                transactions = LoadToTransactionDetailsModel(command, transactions);
+                transactions = await LoadToTransactionDetailsModel(command, transactions);
 
                 string queryString = $"EXEC [dbo].[GetStatements] {transactions.userId}";
 
@@ -165,23 +193,22 @@ namespace money_transfer_server_side.DataServer
 
                 return HttpStatusCode.OK;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return HttpStatusCode.InternalServerError;
             }
         }
-        private TransactionDetailsModel LoadToTransactionDetailsModel(
+        private async Task<TransactionDetailsModel> LoadToTransactionDetailsModel(
             SqlCommand command,
             TransactionDetailsModel transactions)
         {
             if (command != null)
             {
-
                 using (command)
                 {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Connection.Open();
-                    using var reader = command.ExecuteReader();
+                    //command.CommandType = CommandType.StoredProcedure;
+                    //command.Connection.Open();
+                    using var reader = await command.ExecuteReaderAsync();
                     if (reader.Read()) // Check if there are rows
                     {
                         transactions.Balance = Convert.ToDouble(reader["Sum_Balance"]);

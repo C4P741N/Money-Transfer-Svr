@@ -31,27 +31,31 @@ namespace money_transfer_server_side.Controllers
         private readonly IUserRepository _authenticationManager = authenticationManager;
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] UserLogin model) => ProcessRequest(model);
+        public async Task<IActionResult> Register([FromBody] UserLogin model)
+        {
+            return await ProcessRequest(model);
+        }
 
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody] UserLogin model) => ProcessRequest(model);
+        public async Task<IActionResult> Authenticate([FromBody] UserLogin model)
+        {
+            return await ProcessRequest(model);
+        }
 
         [HttpPost("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok();
         }
-        private IActionResult ProcessRequest(
+        private async Task<IActionResult> ProcessRequest(
             UserLogin detailsModel)
         {
             try
             {
                 if (detailsModel.authType is AuthTypes.None) return BadRequest();
 
-                HttpStatusCode status = _authenticationManager.Begin(detailsModel, config);
-
-
+                HttpStatusCode status = await _authenticationManager.Begin(detailsModel, config);
 
                 if (status is HttpStatusCode.Found)
                 {

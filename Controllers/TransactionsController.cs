@@ -22,18 +22,30 @@ namespace money_transfer_server_side.Controllers
         private readonly IMts_TransactionManager _transactionManager = transactionManager;
 
         [HttpPost("deposit")]
-        public IActionResult Deposit([FromBody] TransactionsModel model) => ProcessRequest(model);
+        public async Task<IActionResult> Deposit([FromBody] TransactionsModel model)
+        {
+            return await ProcessRequest(model);
+        }
 
         [HttpPost("withdraw")]
-        public IActionResult Withdraw([FromBody] TransactionsModel model) => ProcessRequest(model);
-        
+        public async Task<IActionResult> Withdraw([FromBody] TransactionsModel model)
+        {
+            return await ProcessRequest(model);
+        }
+
         [HttpPost("populate-dashboard")]
-        public IActionResult GetDashboardValues([FromBody] TransactionsModel model) => ProcessRequest(model);
+        public async Task<IActionResult> GetDashboardValues([FromBody] TransactionsModel model)
+        {
+            return await ProcessRequest(model);
+        }
 
         [HttpPost("credit-transfer")]
-        public IActionResult CreditTransfer([FromBody] TransactionsModel model) => ProcessRequest(model);
+        public async Task<IActionResult> CreditTransfer([FromBody] TransactionsModel model)
+        {
+            return await ProcessRequest(model);
+        }
 
-        private IActionResult ProcessRequest(TransactionsModel transactions)
+        private async Task<IActionResult> ProcessRequest(TransactionsModel transactions)
         {
             try
             {
@@ -41,7 +53,7 @@ namespace money_transfer_server_side.Controllers
 
                 if (string.IsNullOrEmpty(transactions.recepient)) transactions.recepient = "self";
 
-                var model = _transactionManager.Begin(transactions, _config);
+                var model = await _transactionManager.Begin(transactions, _config);
 
                 HttpStatusCode status = model.StatusCode;
 

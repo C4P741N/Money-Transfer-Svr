@@ -7,27 +7,39 @@ namespace money_transfer_server_side.DataServer
     {
         private readonly MsqlDataAdapter _msqlDataAdapter = new(config);
 
-        public HttpStatusCode Withdraw(TransactionsModel transactions) =>
-            _msqlDataAdapter.AddWithdrawTransaction(transactions);
-        
+        public async Task<HttpStatusCode> Withdraw(TransactionsModel transactions)
+        {
+            return await _msqlDataAdapter.AddWithdrawTransaction(transactions); ;
+        }
+
         //public HttpStatusCode GetBalance(TransactionsModel transactions) =>
         //    _msqlDataAdapter.GetSumAmount(transactions);
+
+        public async Task<HttpStatusCode> Deposit(TransactionsModel transactions)
+        {
+            return await _msqlDataAdapter.AddDepositTransaction(transactions); ;
+        }
+
+        public async Task<HttpStatusCode> Authenticate(UserLogin userDetails)
+        {
+            return await _msqlDataAdapter.ValidateUser(userDetails);
+        }
+
+        public async Task<HttpStatusCode> Register(UserLogin userDetails)
+        {
+           return await _msqlDataAdapter.AddUser(userDetails);
+        }
         
-        public HttpStatusCode Deposit(TransactionsModel transactions) =>
-            _msqlDataAdapter.AddDepositTransaction(transactions);
-        
-        public HttpStatusCode Authenticate(UserLogin userDetails) =>
-            _msqlDataAdapter.ValidateUser(userDetails);
-        
-        public HttpStatusCode Register(UserLogin userDetails) =>
-            _msqlDataAdapter.AddUser(userDetails);
-        
-        public HttpStatusCode Unregister(UserLogin userDetails) =>
+        public async Task<HttpStatusCode> Unregister(UserLogin userDetails) =>
             HttpStatusCode.NotImplemented;
-        
-        public HttpStatusCode CreditTransfer(TransactionsModel transactions) =>
-            _msqlDataAdapter.AddTransferFunds(transactions);
-        public HttpStatusCode GetUserStatements(TransactionDetailsModel transactions) =>
-            _msqlDataAdapter.GetTransactionStatements(transactions);
+
+        public async Task<HttpStatusCode> CreditTransfer(TransactionsModel transactions)
+        {
+            return await _msqlDataAdapter.AddTransferFunds(transactions);
+        }
+        public async Task<HttpStatusCode> GetUserStatements(TransactionDetailsModel transactions)
+        {
+            return await _msqlDataAdapter.GetTransactionStatements(transactions);
+        }
     }
 }

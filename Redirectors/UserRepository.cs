@@ -9,7 +9,7 @@ namespace money_transfer_server_side.JsonExtractors
 {
     public class UserRepository : IUserRepository
     {
-        public HttpStatusCode Begin(
+        public async Task<HttpStatusCode> Begin(
             UserLogin userDetails,
             IConfiguration config)
         {
@@ -18,11 +18,11 @@ namespace money_transfer_server_side.JsonExtractors
             switch (userDetails.authType)
             {
                 case AuthTypes.Registration:
-                    return ds.Register(userDetails);
+                    return await ds.Register(userDetails);
                 case AuthTypes.Authentication:
-                    return ds.Authenticate(userDetails);
+                    return await ds.Authenticate(userDetails);
                 case AuthTypes.Unregister:
-                    return ds.Unregister(userDetails);
+                    return await ds.Unregister(userDetails);
                 default:
                     throw new NotSupportedException($"Authentication type {userDetails.authType} is not supported.");
             }

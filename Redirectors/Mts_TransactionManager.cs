@@ -1,4 +1,5 @@
-﻿using money_transfer_server_side.DataServer;
+﻿using Microsoft.AspNetCore.Mvc;
+using money_transfer_server_side.DataServer;
 using money_transfer_server_side.EnumsFactory;
 using money_transfer_server_side.JsonExtractors;
 using money_transfer_server_side.Models;
@@ -8,7 +9,7 @@ namespace money_transfer_server_side.Redirectors
 {
     public class Mts_TransactionManager : IMts_TransactionManager
     {
-        public TransactionsModel Begin(
+        public async Task<TransactionsModel> Begin(
             TransactionsModel transactions,
             IConfiguration config)
         {
@@ -17,10 +18,10 @@ namespace money_transfer_server_side.Redirectors
             switch (transactions.trasactionType)
             {
                 case EnumsAtLarge.TransactionTypes.Withdraw:
-                    transactions.StatusCode = ts.Withdraw(transactions);
+                    transactions.StatusCode = await ts.Withdraw(transactions);
                     return transactions;
                 case EnumsAtLarge.TransactionTypes.Deposit:
-                    transactions.StatusCode = ts.Deposit(transactions);
+                    transactions.StatusCode = await ts.Deposit(transactions);
                     return transactions;
                 case EnumsAtLarge.TransactionTypes.GetDashboardValues:
                     TransactionDetailsModel transactionDetails = new()
@@ -29,11 +30,11 @@ namespace money_transfer_server_side.Redirectors
                         trasactionType = transactions.trasactionType
                     };
 
-                    transactionDetails.StatusCode = ts.GetUserStatements(transactionDetails);
+                    transactionDetails.StatusCode = await ts.GetUserStatements(transactionDetails);
 
                     return transactionDetails;
                 case EnumsAtLarge.TransactionTypes.CreditTransfer:
-                    transactions.StatusCode = ts.CreditTransfer(transactions);
+                    transactions.StatusCode = await ts.CreditTransfer(transactions);
                     return transactions;
                 default:
                     throw new NotSupportedException($"Transaction type {transactions.trasactionType} is not supported.");

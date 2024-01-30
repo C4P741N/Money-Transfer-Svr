@@ -5,10 +5,10 @@ namespace money_transfer_server_side.DataServer
 {
     public interface ITrans
     {
-        HttpStatusCode Withdraw(TransactionsModel transactions);
-        HttpStatusCode Deposit(TransactionsModel transactions);
+        Task<HttpStatusCode> Withdraw(TransactionsModel transactions);
+        Task<HttpStatusCode> Deposit(TransactionsModel transactions);
         //HttpStatusCode GetBalance(TransactionsModel transactions);
-        HttpStatusCode CreditTransfer(TransactionsModel transactions);
-        HttpStatusCode GetUserStatements(TransactionDetailsModel transactions);
+        Task<HttpStatusCode> CreditTransfer(TransactionsModel transactions);
+        Task<HttpStatusCode> GetUserStatements(TransactionDetailsModel transactions);
     }
 }
