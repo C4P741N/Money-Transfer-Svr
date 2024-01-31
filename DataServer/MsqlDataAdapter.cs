@@ -76,6 +76,26 @@ namespace money_transfer_server_side.DataServer
                 return reader.Read() ? reader[0].ToString() : null;
             }
         }
+        public async Task<HttpStatusCode> GetContacts(ContactsModel contacts)
+        {
+            try
+            {
+                int depsit = (int)EnumsAtLarge.TransactionTypes.Deposit;
+                int transfer = (int)EnumsAtLarge.TransactionTypes.CreditTransfer;
+                int withdraw = (int)EnumsAtLarge.TransactionTypes.Withdraw;
+
+
+                string queryString = $"EXEC [dbo].[GetContacts] {contacts.userId}, {depsit}, {transfer}, {withdraw}";
+
+                contacts.Contacts = LoadBatchData<ContactModel>(queryString);
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception)
+            {
+                return HttpStatusCode.InternalServerError;
+            }
+        }
         public async Task<HttpStatusCode> AddTransferFunds(TransactionsModel transactions)
         {
             return await AddWithdrawTransaction(transactions);

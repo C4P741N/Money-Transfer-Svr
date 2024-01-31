@@ -5,6 +5,7 @@ namespace money_transfer_server_side.DataServer
 {
     public interface ITrans
     {
+        Task<HttpStatusCode> GetContacts(ContactsModel contacts);
         Task<HttpStatusCode> Withdraw(TransactionsModel transactions);
         Task<HttpStatusCode> Deposit(TransactionsModel transactions);
         //HttpStatusCode GetBalance(TransactionsModel transactions);

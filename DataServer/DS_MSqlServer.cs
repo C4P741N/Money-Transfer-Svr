@@ -6,7 +6,10 @@ namespace money_transfer_server_side.DataServer
     public class DS_MSqlServer(IConfiguration config) : IAuth
     {
         private readonly MsqlDataAdapter _msqlDataAdapter = new(config);
-
+        public async Task<HttpStatusCode> GetContacts(ContactsModel contacts)
+        {
+            return await _msqlDataAdapter.GetContacts(contacts);
+        }
         public async Task<HttpStatusCode> Withdraw(TransactionsModel transactions)
         {
             return await _msqlDataAdapter.AddWithdrawTransaction(transactions); ;

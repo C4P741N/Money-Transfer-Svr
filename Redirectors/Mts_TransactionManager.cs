@@ -36,6 +36,15 @@ namespace money_transfer_server_side.Redirectors
                 case EnumsAtLarge.TransactionTypes.CreditTransfer:
                     transactions.StatusCode = await ts.CreditTransfer(transactions);
                     return transactions;
+                case EnumsAtLarge.TransactionTypes.GetContacts:
+                    ContactsModel contacts = new()
+                    {
+                        userId = transactions.userId,
+                        trasactionType = transactions.trasactionType
+                    };
+
+                    contacts.StatusCode = await ts.GetContacts(contacts);
+                    return contacts;
                 default:
                     throw new NotSupportedException($"Transaction type {transactions.trasactionType} is not supported.");
             }

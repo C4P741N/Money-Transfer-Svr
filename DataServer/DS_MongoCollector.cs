@@ -350,6 +350,11 @@ namespace money_transfer_server_side.DataServer
         {
             throw new NotImplementedException();
         }
+
+        public Task<HttpStatusCode> GetContacts(ContactsModel contacts)
+        {
+            throw new NotImplementedException();
+        }
     }
     public class Weather
     {

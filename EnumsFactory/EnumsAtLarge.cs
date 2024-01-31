@@ -21,7 +21,8 @@
             Withdraw = 1,
             Deposit= 2,
             GetDashboardValues = 3,
-            CreditTransfer = 4
+            CreditTransfer = 4,
+            GetContacts = 5,
         }
     }
 }

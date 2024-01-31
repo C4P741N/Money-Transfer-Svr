@@ -38,6 +38,11 @@ namespace money_transfer_server_side.Controllers
         {
             return await ProcessRequest(model);
         }
+        [HttpPost("populate-contacts")]
+        public async Task<IActionResult> GetContacts([FromBody] TransactionsModel model)
+        {
+            return await ProcessRequest(model);
+        }
 
         [HttpPost("credit-transfer")]
         public async Task<IActionResult> CreditTransfer([FromBody] TransactionsModel model)
