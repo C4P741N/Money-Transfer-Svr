@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>DB_Money_Transfer_Svr</Name>
+    <Name>00_Proj_DB_Money-Transfer-Svr</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{dd73578e-8522-473c-8c81-31dc31499421}</ProjectGuid>
