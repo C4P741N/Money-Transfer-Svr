@@ -1,9 +1,0 @@
-﻿CREATE TABLE [dbo].[Accounts]
-(
-	ID				INT NOT NULL IDENTITY (1, 1),
-	[DocEntry]		AS 'A' + CAST(ID AS NVARCHAR(10)) PERSISTED PRIMARY KEY,
-	[UserDocEntry]	NVARCHAR(255) NOT NULL ,
-	[Balance]		DECIMAL(20,2) NOT NULL,
-	[AmountSent]		DECIMAL(20,2) NOT NULL,
-	[AmountReceived]		DECIMAL(20,2) NOT NULL,
-)

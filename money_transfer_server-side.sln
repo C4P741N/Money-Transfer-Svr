@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "00_Proj_Money_Transfer_Svr", "00_Proj_Money_Transfer_Svr.csproj", "{7D85FF3B-07DF-4025-A603-0D268D8530FC}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "00_Proj_DB_Money-Transfer-Svr", "DB_Money-Transfer-Svr\00_Proj_DB_Money-Transfer-Svr.sqlproj", "{DD73578E-8522-473C-8C81-31DC31499421}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "00_Proj_Money_Transfer_Svr.Tests", "..\money_transfer_server-side.Tests\00_Proj_Money_Transfer_Svr.Tests.csproj", "{D19EA308-CC13-41D3-BAAF-0CFE4CD6D9D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "00_Proj_Money_Transfer_Svr.Tests", "money_transfer_server-side.Tests\00_Proj_Money_Transfer_Svr.Tests.csproj", "{A09A6817-A6E5-4EAF-9DD2-688D40614F24}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "00_Proj_DB_Money-Transfer-Svr", "..\DB_Money-Transfer-Svr\00_Proj_DB_Money-Transfer-Svr.sqlproj", "{DD73578E-8522-473C-8C81-31DC31499421}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,16 +19,16 @@ Global
 		{7D85FF3B-07DF-4025-A603-0D268D8530FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D85FF3B-07DF-4025-A603-0D268D8530FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D85FF3B-07DF-4025-A603-0D268D8530FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D19EA308-CC13-41D3-BAAF-0CFE4CD6D9D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D19EA308-CC13-41D3-BAAF-0CFE4CD6D9D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D19EA308-CC13-41D3-BAAF-0CFE4CD6D9D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D19EA308-CC13-41D3-BAAF-0CFE4CD6D9D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DD73578E-8522-473C-8C81-31DC31499421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DD73578E-8522-473C-8C81-31DC31499421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD73578E-8522-473C-8C81-31DC31499421}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{DD73578E-8522-473C-8C81-31DC31499421}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD73578E-8522-473C-8C81-31DC31499421}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DD73578E-8522-473C-8C81-31DC31499421}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{A09A6817-A6E5-4EAF-9DD2-688D40614F24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A09A6817-A6E5-4EAF-9DD2-688D40614F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A09A6817-A6E5-4EAF-9DD2-688D40614F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A09A6817-A6E5-4EAF-9DD2-688D40614F24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
